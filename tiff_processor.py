@@ -17,63 +17,46 @@ class TiffProcessor:
         self.num_frames = len(self.img)
         #print(f'dtype: {self.img.dtype}, shape: {self.img.shape}, min: {np.min(self.img)}, max: {np.max(self.img)}')
 
-    def get_img(self, frame_idx):
-        return self.img[frame_idx]
+    def get_img(self, frame_idx, threshold, ksize1, ksize2):
+        return self.process_img(self.img[frame_idx], threshold, ksize1, ksize2)
 
-def process_img(val):
-    result = img
-    if show_orig == 0:
-        cv2.imshow(title_erosion_window, result)
-        return
+    def process_img(self, img, threshold, ksize1, ksize2):
+        _,mask = cv2.threshold(img,threshold,255,cv2.THRESH_TOZERO)
+        inverted_mask = cv2.bitwise_not(mask)
 
-    # TODO: Add trackbar for threshold
-    _,mask = cv2.threshold(result,60,255,cv2.THRESH_TOZERO)
-    inverted_mask = cv2.bitwise_not(mask)
-    inverted_mask = dilation(inverted_mask)
-    inverted_mask = erosion(inverted_mask)
+        e_element = cv2.getStructuringElement(self.morph_shape(0), (2*ksize1+1,2*ksize1+1),(ksize1,ksize1))
+        d_element = cv2.getStructuringElement(self.morph_shape(2), (2*ksize2+1,2*ksize2+1),(ksize2,ksize2))
 
-    if show_orig == 1:
-        cv2.imshow(title_erosion_window, inverted_mask)
-    elif show_orig == 2:
+        inverted_mask = cv2.dilate(inverted_mask, d_element)
+        inverted_mask = cv2.erode(inverted_mask, e_element)
+
         inverted_mask = cv2.normalize(inverted_mask,None,alpha=0,beta=1,norm_type=cv2.NORM_MINMAX,dtype=cv2.CV_32F)
         result = img.astype(np.float32)
         for i in range(3):
             result = cv2.multiply(result,inverted_mask)
         result = cv2.normalize(result,None,alpha=0,beta=204,norm_type=cv2.NORM_MINMAX,dtype=cv2.CV_8U)
-        result = erosion(result)
-        result = dilation(result)
-        cv2.imshow(title_erosion_window, result)
+        result = cv2.erode(result, e_element)
+        result = cv2.dilate(result, d_element)
+        return result
 
-def erosion(src):
-    erosion_size = cv2.getTrackbarPos(trackbar_erosion_kernel_size, title_erosion_window)
-    erosion_shape = morph_shape(cv2.getTrackbarPos(trackbar_erosion_element_shape, title_erosion_window))
+    def erosion(self, src, element):
+        result = cv2.erode(src, element)
+        return result
 
-    element = cv2.getStructuringElement(erosion_shape, (2*erosion_size+1,2*erosion_size+1),
-        (erosion_size,erosion_size))
+    def dilation(self, src, element):
+        result = cv2.dilate(src, element)
+        return result
 
-    result = cv2.erode(src, element)
-    return result
-
-def dilation(src):
-    dilation_size = cv2.getTrackbarPos(trackbar_dilation_kernel_size, title_erosion_window)
-    dilation_shape = morph_shape(cv2.getTrackbarPos(trackbar_dilation_element_shape, title_erosion_window))
-
-    element = cv2.getStructuringElement(dilation_shape, (2*dilation_size+1,2*dilation_size+1),
-        (dilation_size,dilation_size))
-
-    result = cv2.dilate(src, element)
-    return result
-
-def morph_shape(val):
-    match val:
-        case 0:
-            return cv2.MORPH_RECT
-        case 1:
-            return cv2.MORPH_CROSS
-        case 2:
-            return cv2.MORPH_ELLIPSE
-        case _:
-            return cv2.MORPH_ELLIPSE
+    def morph_shape(self, val):
+        match val:
+            case 0:
+                return cv2.MORPH_RECT
+            case 1:
+                return cv2.MORPH_CROSS
+            case 2:
+                return cv2.MORPH_ELLIPSE
+            case _:
+                return cv2.MORPH_ELLIPSE
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Code for Eroding.")

@@ -43,7 +43,7 @@ def process_img(val):
     _,mask = cv2.threshold(result,60,255,cv2.THRESH_TOZERO)
     inverted_mask = cv2.bitwise_not(mask)
     inverted_mask = dilation(inverted_mask)
-    inverted_mask = erosion(inverted_mask)
+    #inverted_mask = erosion(inverted_mask)
 
     if show_orig == 1:
         cv2.imshow(title_erosion_window, inverted_mask)

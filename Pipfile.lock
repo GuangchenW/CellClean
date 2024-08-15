@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "eb2b93393e86193fdd9478c73295869716d63cca3770c57a6a4d236e91609a24"
+            "sha256": "8854e1e35c5f07f39ddaa5b5285f02dcf90d6e10876dfc585660a369f93a8d56"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -167,6 +167,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.8'",
             "version": "==10.4.0"
+        },
+        "tkinter-tooltip": {
+            "hashes": [
+                "sha256:631cb154b05a356afc8ebdf5dd066a0b030dc6a9d739e7ccb69f9c345a4c9b51",
+                "sha256:daf57bbb22a858670d4b3d5a0b906a2a791c57d678ab3b1338c60eb9ed9d7d36"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==3.1.0"
         }
     },
     "develop": {}
